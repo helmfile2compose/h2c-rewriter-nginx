@@ -8,6 +8,9 @@
 
 Nginx ingress annotation rewriter for [helmfile2compose](https://github.com/helmfile2compose).
 
+Excluded from the core because you shouldn't use nginx-ingress anymore, it's deprecated.
+Still, it's here if you want it, I know legacy is hard to fight.
+
 ## Handled annotations
 
 | Annotation | Caddy equivalent |
