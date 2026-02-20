@@ -2,7 +2,7 @@
 
 import re
 
-from helmfile2compose import IngressRewriter, get_ingress_class, resolve_backend
+from h2c import IngressRewriter, get_ingress_class, resolve_backend
 
 
 def _extract_strip_prefix_nginx(annotations, path):
