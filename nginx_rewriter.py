@@ -36,8 +36,7 @@ class NginxRewriter(IngressRewriter):
             host = rule.get("host", "")
             if not host:
                 continue
-            http = rule.get("http", {})
-            for path_entry in http.get("paths", []):
+            for path_entry in (rule.get("http") or {}).get("paths") or []:
                 path = path_entry.get("path", "/")
                 backend = resolve_backend(path_entry, manifest, ctx)
 
