@@ -8,8 +8,7 @@
 
 Nginx ingress annotation rewriter for [dekube](https://dekube.io).
 
-Excluded from the core because you shouldn't use nginx-ingress anymore, it's deprecated.
-Still, it's here if you want it, I know legacy is hard to fight.
+Excluded from the core because nginx-ingress is deprecated. Still here, because legacy doesn't care about deprecation notices — and neither does your helmfile.
 
 ## Handled annotations
 
