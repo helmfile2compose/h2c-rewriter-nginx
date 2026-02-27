@@ -2,7 +2,7 @@
 
 import re
 
-from h2c import IngressRewriter, get_ingress_class, resolve_backend  # pylint: disable=import-error  # h2c resolves at runtime
+from dekube import IngressRewriter, get_ingress_class, resolve_backend  # pylint: disable=import-error  # h2c resolves at runtime
 
 
 def _extract_strip_prefix_nginx(annotations, path):

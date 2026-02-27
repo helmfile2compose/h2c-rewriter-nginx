@@ -1,4 +1,4 @@
-# h2c-rewriter-nginx
+# dekube-rewriter-nginx
 
 ![vibe coded](https://img.shields.io/badge/vibe-coded-ff69b4)
 ![python 3](https://img.shields.io/badge/python-3-3776AB)
@@ -6,7 +6,7 @@
 ![stdlib only](https://img.shields.io/badge/dependencies-stdlib%20only-brightgreen)
 ![public domain](https://img.shields.io/badge/license-public%20domain-brightgreen)
 
-Nginx ingress annotation rewriter for [helmfile2compose](https://github.com/helmfile2compose).
+Nginx ingress annotation rewriter for [dekube](https://dekube.io).
 
 Excluded from the core because you shouldn't use nginx-ingress anymore, it's deprecated.
 Still, it's here if you want it, I know legacy is hard to fight.
@@ -34,7 +34,7 @@ Matches Ingress manifests with:
 ## Installation
 
 ```bash
-python3 h2c-manager.py nginx
+python3 dekube-manager.py nginx
 ```
 
 Or manually:
@@ -56,7 +56,7 @@ cp nginx_rewriter.py /path/to/extensions-dir/
 
 Worst CC: `NginxRewriter.rewrite` (18, C).
 
-The `E0401: Unable to import 'h2c'` is expected — extensions import from h2c-core at runtime, not at lint time.
+The `E0401: Unable to import 'dekube'` is expected — extensions import from dekube-engine at runtime, not at lint time.
 
 ## Dependencies
 
