@@ -1,4 +1,4 @@
-"""h2c-rewriter-nginx — Nginx ingress annotation rewriter for helmfile2compose."""
+"""dekube-rewriter-nginx — Nginx ingress annotation rewriter."""
 
 import re
 
@@ -16,7 +16,7 @@ def _extract_strip_prefix_nginx(annotations, path):
 
 
 class NginxRewriter(IngressRewriter):
-    """Rewrite nginx ingress annotations to Caddy entries."""
+    """Rewrite nginx ingress annotations to structured ingress entries."""
     name = "nginx"
 
     def match(self, manifest, ctx):
@@ -29,7 +29,7 @@ class NginxRewriter(IngressRewriter):
         return any(k.startswith("nginx.ingress.kubernetes.io/") for k in annotations)
 
     def rewrite(self, manifest, ctx):
-        """Rewrite nginx ingress manifest to Caddy entries."""
+        """Rewrite nginx ingress manifest to structured ingress entries."""
         entries = []
         annotations = manifest.get("metadata", {}).get("annotations") or {}
         spec = manifest.get("spec") or {}
@@ -58,50 +58,45 @@ class NginxRewriter(IngressRewriter):
                     "strip_prefix": strip_prefix,
                 }
 
-                # Collect extra directives from nginx annotations
-                extra = []
+                # Response headers from CORS and configuration-snippet
+                response_headers = {}
 
                 # CORS
                 cors_enabled = annotations.get(
                     "nginx.ingress.kubernetes.io/enable-cors", "").lower()
                 if cors_enabled == "true":
-                    origins = annotations.get(
+                    response_headers["Access-Control-Allow-Origin"] = annotations.get(
                         "nginx.ingress.kubernetes.io/cors-allow-origin", "*")
-                    methods = annotations.get(
+                    response_headers["Access-Control-Allow-Methods"] = annotations.get(
                         "nginx.ingress.kubernetes.io/cors-allow-methods",
                         "GET, PUT, POST, DELETE, PATCH, OPTIONS")
-                    headers = annotations.get(
+                    response_headers["Access-Control-Allow-Headers"] = annotations.get(
                         "nginx.ingress.kubernetes.io/cors-allow-headers",
                         "DNT,X-CustomHeader,Keep-Alive,User-Agent,"
                         "X-Requested-With,If-Modified-Since,Cache-Control,"
                         "Content-Type,Authorization")
-                    extra.append(f"header Access-Control-Allow-Origin \"{origins}\"")
-                    extra.append(f"header Access-Control-Allow-Methods \"{methods}\"")
-                    extra.append(f"header Access-Control-Allow-Headers \"{headers}\"")
 
-                # Custom headers
+                # Custom headers from configuration-snippet
                 config_snippet = annotations.get(
                     "nginx.ingress.kubernetes.io/configuration-snippet", "")
                 for line in config_snippet.splitlines():
                     line = line.strip().rstrip(";")
                     if line.startswith("more_set_headers"):
-                        # more_set_headers "X-Key: value" → header X-Key value
                         parts = line.split(None, 1)
                         if len(parts) == 2:
                             header_val = parts[1].strip("\"' ")
                             if ":" in header_val:
                                 hk, hv = header_val.split(":", 1)
-                                extra.append(
-                                    f"header {hk.strip()} \"{hv.strip()}\"")
+                                response_headers[hk.strip()] = hv.strip()
 
-                # Proxy body size → request_body max_size
+                if response_headers:
+                    entry["response_headers"] = response_headers
+
+                # Proxy body size
                 body_size = annotations.get(
                     "nginx.ingress.kubernetes.io/proxy-body-size", "")
                 if body_size and body_size != "0":
-                    extra.append(f"request_body max_size {body_size}")
-
-                if extra:
-                    entry["extra_directives"] = extra
+                    entry["max_body_size"] = body_size
 
                 entries.append(entry)
 
