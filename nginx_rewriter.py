@@ -78,7 +78,7 @@ class NginxRewriter(IngressRewriter):
 
                 # Custom headers from configuration-snippet
                 config_snippet = annotations.get(
-                    "nginx.ingress.kubernetes.io/configuration-snippet", "")
+                    "nginx.ingress.kubernetes.io/configuration-snippet") or ""
                 for line in config_snippet.splitlines():
                     line = line.strip().rstrip(";")
                     if line.startswith("more_set_headers"):
